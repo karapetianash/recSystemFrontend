@@ -10,6 +10,7 @@ import (
 
 type Recommendation struct {
 	MovieId         int     `json:"movie_id"`
+	Title           string  `json:"title"`
 	PredictedRating float64 `json:"predicted_rating"`
 }
 
@@ -52,7 +53,7 @@ func userExists(db *sql.DB, userId int) bool {
 
 func getRecommendations(db *sql.DB, userId int, n int) ([]Recommendation, error) {
 	query := `
-        SELECT movieId, predicted_rating
+        SELECT movieId, title, predicted_rating
         FROM recommendations
         WHERE userId=?
         ORDER BY predicted_rating DESC
@@ -67,7 +68,7 @@ func getRecommendations(db *sql.DB, userId int, n int) ([]Recommendation, error)
 	recommendations := make([]Recommendation, 0)
 	for rows.Next() {
 		var rec Recommendation
-		if err := rows.Scan(&rec.MovieId, &rec.PredictedRating); err != nil {
+		if err = rows.Scan(&rec.MovieId, &rec.Title, &rec.PredictedRating); err != nil {
 			return nil, err
 		}
 		recommendations = append(recommendations, rec)

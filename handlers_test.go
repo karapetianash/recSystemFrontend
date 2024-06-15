@@ -41,6 +41,7 @@ func createTables(db *sql.DB) {
     CREATE TABLE IF NOT EXISTS recommendations (
         userId INTEGER,
         movieId INTEGER,
+        title TEXT,
         predicted_rating REAL,
         PRIMARY KEY (userId, movieId)
     );
@@ -65,9 +66,9 @@ func insertTestData(db *sql.DB) {
 	}
 
 	insertRecommendationsSQL := `
-    INSERT INTO recommendations (userId, movieId, predicted_rating) VALUES (1, 3, 4.5);
-    INSERT INTO recommendations (userId, movieId, predicted_rating) VALUES (1, 2, 4.2);
-    INSERT INTO recommendations (userId, movieId, predicted_rating) VALUES (2, 1, 3.5);
+    INSERT INTO recommendations (userId, movieId, title, predicted_rating) VALUES (1, 3, 'Movie 3', 4.5);
+    INSERT INTO recommendations (userId, movieId, title, predicted_rating) VALUES (1, 2, 'Movie 2', 4.2);
+    INSERT INTO recommendations (userId, movieId, title, predicted_rating) VALUES (2, 1, 'Movie 1', 3.5);
     `
 	_, err = db.Exec(insertRecommendationsSQL)
 	if err != nil {
@@ -93,7 +94,7 @@ func TestGetRecommendationsHandler(t *testing.T) {
 			t.Fatalf("Expected status code %d, got %d", http.StatusOK, w.Code)
 		}
 
-		expectedBody := `[{"movie_id":3,"predicted_rating":4.5},{"movie_id":2,"predicted_rating":4.2}]`
+		expectedBody := `[{"movie_id":3,"title":"Movie 3","predicted_rating":4.5},{"movie_id":2,"title":"Movie 2","predicted_rating":4.2}]`
 		if strings.TrimSpace(w.Body.String()) != expectedBody {
 			t.Fatalf("Expected body %s, got %s", expectedBody, w.Body.String())
 		}
